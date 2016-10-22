@@ -1,12 +1,15 @@
 var express = require('express'),
     _       = require('lodash'),
     config  = require('../config'),
-    jwt     = require('jsonwebtoken')
+    jwt     = require('jsonwebtoken'),
+    ejwt    = require('express-jwt'),
     db      = require('../db');
 
 var app = module.exports = express.Router();
 
-var secretKey = "don't share this key";
+var jwtCheck = ejwt({
+  secret: config.secretKey
+});
 
 function createToken(user) {
   return jwt.sign(_.omit(user, 'password'), config.secretKey, { expiresIn: 60*60*5 });
@@ -30,7 +33,8 @@ app.post('/user/create', function(req, res) {
       user = {
         username: req.body.username,
         password: req.body.password,
-        email: req.body.email
+        email: req.body.email,
+        role: 'Regitered'
       };
       db.get().query('INSERT INTO users SET ?', [user], function(err, result){
         if (err) throw err;
@@ -38,7 +42,8 @@ app.post('/user/create', function(req, res) {
           id: result.insertId,
           username: user.username,
           password: user.password,
-          email: user.email
+          email: user.email,
+          role: 'Regitered'
         };
         //console.log(newUser);
         res.status(201).send({
@@ -79,4 +84,8 @@ app.get('/user/check/:username', function(req, res) {
     if(!user) res.status(201).send({username: "OK"});
     else res.status(400).send("A user with that username already exists");
   });
+});
+
+app.get('/user/verify', jwtCheck, function(req, res){
+  res.send({verify: 'OK'});
 });
