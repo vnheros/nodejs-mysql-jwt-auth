@@ -87,5 +87,12 @@ app.get('/user/check/:username', function(req, res) {
 });
 
 app.get('/user/verify', jwtCheck, function(req, res){
-  res.send({verify: 'OK'});
+  var user = req.user;
+        db.get().query('SELECT * FROM users WHERE username = ? LIMIT 1', [user.username], function(err, rows) {
+            if(err){
+              res.status(422).send({error: 'No user found.'});
+            }
+            var foundUser = rows[0];
+            res.send(foundUser);
+        });
 });

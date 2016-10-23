@@ -9,6 +9,7 @@ var cors = require('cors'); //add cors
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var quotes = require('./routes/quotes'); //quotes
+var todos = require('./routes/todos'); //quotes
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use('/', routes);
 //app.use('/users', users); //change to below line
 app.use(users);
 app.use(quotes); //quotes
+app.use(todos); //todos
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
